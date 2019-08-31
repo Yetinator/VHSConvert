@@ -43,15 +43,33 @@ def functionRecord():
 
     stallFunction()
 
+
 def functionConvert(event):
     #convert function
     widget = event.widget
     selection=widget.curselection()
     value = widget.get(selection[0])
     movieTitle = value
+
+    #temp tk box for aspect ratio
+    selectBoxConversion = tk.Tk()
+    aspectInput = tk.Listbox(selectBoxConversion)
+    aspectInput.insert(tk.END, "4/3")
+    aspectInput.insert(tk.END, "16/9")
+    aspectInput.insert(tk.END, "1.85/1")
+    enterButton = tk.Button(selectBoxConversion, text="Enter")
+    a = aspectInput.bind("<Double-Button-1>", aspectInput.get(tk.ACTIVE))
+    print(a)
+
+    aspectInput.pack()
+    enterButton.pack()
+
+    #print("element " + element)
+
+
     theMovie = MenConstruct(movieTitle)
     #use variable setters for stuff here
-    
+
 
     stallFunction()
 

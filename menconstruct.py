@@ -65,7 +65,7 @@ class MenConstruct:
         self.totalFileDurationSec = round(float(temp) / 1000,0)
         print("temp as rounded " + str(temp))
 
-        self.endPosition = self.end_position_manually()
+        self.endPosition = self.end_position_automatically()
         #second get blackscreen data... will need to analyze file to decide the end of the credits
 
 
@@ -96,6 +96,17 @@ class MenConstruct:
         else:
             print("bad endpPos value!!!!!")
             return "00:00:01"
+
+    def end_position_automatically(self):
+        #"00:00:03"
+        valuePass = False
+
+        x = self.totalFileDurationSec
+
+        timestring = self.convertSecToTime(x)
+        print(timestring)
+        return timestring
+
 
     def set_aspect_ratio(self):
         print("Pick aspect ratio: ")

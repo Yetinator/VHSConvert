@@ -178,7 +178,7 @@ V:  10.0  81/ 81  3%  0%  0.0% 0 0 [J
 V:  10.0  82/ 82  3%  0%  0.0% 0 0 [J
 
 
-BENCHMARKs: VC:   0.085s VO:   0.006s A:   0.000s Sys:   0.007s =    0.098s
-BENCHMARK%: VC: 86.5088% VO:  6.6208% A:  0.0000% Sys:  6.8704% = 100.0000%
+BENCHMARKs: VC:   0.085s VO:   0.007s A:   0.000s Sys:   0.006s =    0.098s
+BENCHMARK%: VC: 86.7057% VO:  6.7000% A:  0.0000% Sys:  6.5943% = 100.0000%
 
 Exiting... (End of file)
