@@ -9,15 +9,20 @@ import tempfile
 # referanceFilePath = "smb://mediacenter/public/Movies/"
 # MPLAYERRANGE = ["00:10:00", "00:00:15"]
 
-referanceFilePath =""
+referanceFilePath ="/home/brian/Videos/RawVHSFiles/"
+referanceFilePathOutputFiles = "/home/brian/Videos/FinishedVHSFiles/"
+#TODO fix this referance path and the one in main to match
 MPLAYERRANGE = ["00:00:07", "00:00:03"] #the second value here isn't a timestamp it is a duration
 
 
 
 class MenConstruct:
-    def __init__(self):
+    def __init__(self, title):
         self.aspectRatioValue = "16/9"
-        self.title =  input("Enter a movieTitle: ")
+
+        #self.title =  input("Enter a movieTitle: ")
+        self.title = title[:-4]
+
         self.set_file_paths()
         self.set_crop_info()
         self.set_end_pos()
@@ -29,7 +34,7 @@ class MenConstruct:
 
     def set_file_paths(self):
         self.originFile = referanceFilePath + str(self.title) + ".mpg"
-        self.finishedFile = referanceFilePath + str(self.title) + "VHS.avi"
+        self.finishedFile = referanceFilePathOutputFiles + str(self.title) + "VHS.avi"
 
     def set_crop_info(self):
         command = "mplayer " + self.originFile + " -vf cropdetect -benchmark -nosound -vo null -ss {} -endpos {}".format(MPLAYERRANGE[0], MPLAYERRANGE[1])
