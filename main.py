@@ -108,23 +108,24 @@ def functionTest2():
 
     stallFunction()
 
-def function6():
-    print("function6")
-    stallFunction()
-
-def function7():
-    print("function7")
-    stallFunction()
-
-def function8():
-    print("function8")
-    stallFunction()
+# def function6():
+#     print("function6")
+#     stallFunction()
+#
+# def function7():
+#     print("function7")
+#     stallFunction()
+#
+# def function8():
+#     print("function8")
+#     stallFunction()
 
 #def quit():
 #    global PROGRAMRUNNING
 #    PROGRAMRUNNING = False
 
 def stallFunction():
+    #literally stalls the function
     continue1 = True
     continue1 = input("Press any key to continue")
     while continue1 == True:
@@ -148,39 +149,39 @@ def createFileList():
 # options = {'this': fuction1, 'that':functionConvert, 'the other':functionPlay}
 options = ['Record','Convert','Play','Test','Test2','quit']
 
-def mainScreen(message = None):
-    global PROGRAMRUNNING
-    os.system("clear")
-    print(message)
-    theMessage = ""
-    for option in options:
-        print(str(options.index(option) + 1) + ":  " + option)
-
-    uInput = input("Select: ")
-    print(uInput)
-
-
-    try:
-        uInput = int(uInput)
-        if uInput == 1:
-            functionRecord()
-        if uInput == 2:
-            functionConvert()
-        if uInput == 3:
-            functionPlay()
-        exitInput = len(options)
-        if uInput == 4:
-            functionTest1()
-        if uInput == 5:
-            functionTest2()
-
-        if uInput == len(options):
-            quit()
-    except:
-        theMessage = "Pick a correct value"
-
-    if PROGRAMRUNNING == True:
-        mainScreen(theMessage)
+# def mainScreen(message = None):
+#     global PROGRAMRUNNING
+#     os.system("clear")
+#     print(message)
+#     theMessage = ""
+#     for option in options:
+#         print(str(options.index(option) + 1) + ":  " + option)
+#
+#     uInput = input("Select: ")
+#     print(uInput)
+#
+#
+#     try:
+#         uInput = int(uInput)
+#         if uInput == 1:
+#             functionRecord()
+#         if uInput == 2:
+#             functionConvert()
+#         if uInput == 3:
+#             functionPlay()
+#         exitInput = len(options)
+#         if uInput == 4:
+#             functionTest1()
+#         if uInput == 5:
+#             functionTest2()
+#
+#         if uInput == len(options):
+#             quit()
+#     except:
+#         theMessage = "Pick a correct value"
+#
+#     if PROGRAMRUNNING == True:
+#         mainScreen(theMessage)
 
 
 #let's make a gui!
