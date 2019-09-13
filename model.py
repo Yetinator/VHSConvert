@@ -8,10 +8,17 @@ import tempfile
 import controller
 from configurations import *
 
+#hocus pocus
+mypath = "/home/brian/Videos/RawVHSFiles"
+from os import listdir
+from os.path import isfile, join
+onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+
 # Model class here, basically MenConstruct class
 class Model:
+
     def __init__(self):
-        pass
+        self.referanceFilePathOriginalMovies = referanceFilePath
 
     def functionRecord(self):
         #record Function
@@ -38,29 +45,28 @@ class Model:
 
     def functionConvert(event):
         #convert function
+
+        #This was the listbox select to get the movieTitle.  Change this.  Todo
         self.widget = event.widget
         self.selection=self.widget.curselection()
         self.value = self.widget.get(self.selection[0])
         self.movieTitle = self.value
 
-        #self.temp tk box for aspect ratio
-        # selectBoxConversion = tk.Tk()
-        # aspectInput = tk.Listbox(selectBoxConversion)
-        # aspectInput.insert(tk.END, "4/3")
-        # aspectInput.insert(tk.END, "16/9")
-        # aspectInput.insert(tk.END, "1.85/1")
-        # enterButton = tk.Button(selectBoxConversion, text="Enter")
-        # a = aspectInput.bind("<Double-Button-1>", aspectInput.get(tk.ACTIVE))
-        # print(a)
-        #
-        # aspectInput.pack()
-        # enterButton.pack()
 
-        #print("element " + element)
-
-
+        #Try to construct MenConstruct without inputs and get inputs one by one as programically makes sense
         theMovie = MenConstruct(movieTitle)
+
         #use variable setters for stuff here
+                # self.crop_info_entered = False
+                # self.end_pos_entered = False
+                # self.aspect_ratio_entered = False
+
+        #Find the end position and feed to front end?
+        self.end_pos = theMovie.find_end_pos()
+
+        #set crop info
+        cropEntry = False
+        theMovie.set_crop_info(cropEntry)
 
 
         stallFunction()
@@ -94,32 +100,15 @@ class Model:
                 self.temp = line.split("vf_blackframe:")
                 temp2 = self.temp[1].split(", ")
                 print(temp2[0])
-        #
-        # self.temp = round(float(self.temp) / 1000,0)
-        # print("self.temp as rounded " + str(self.temp))
+
 
         stallFunction()
 
-    # def function6():
-    #     print("function6")
-    #     stallFunction()
-    #
-    # def function7():
-    #     print("function7")
-    #     stallFunction()
-    #
-    # def function8():
-    #     print("function8")
-    #     stallFunction()
-
-    #def quit():
-    #    global PROGRAMRUNNING
-    #    PROGRAMRUNNING = False
 
     def stallFunction():
         #literally stalls the function
         continue1 = True
-        continue1 = input("Press any key to continue")
+        continue1 = input("This is the Stall Function.  Press a key")
         while continue1 == True:
             sleep(5)
 
@@ -127,15 +116,27 @@ class Model:
         exit()
 
     #helper functions
-    def createFileList():
+    # def createFileList():
+    #     theList = []
+    #     a = referanceFilePathOriginalMovies
+    #     for item in onlyfiles:
+    #         theList.append(item)
+    #
+    #     return theList
+
+    def getRawMovieFileList(self):
         theList = []
-        a = referanceFilePathOriginalMovies
+        # a = self.referanceFilePathOriginalMovies
         for item in onlyfiles:
             theList.append(item)
-
         return theList
 
+    def setMovieTitle(self, movie):
+        print("In the thing")
+
 class MenConstruct:
+
+    #the first initiallizer is devalued and only here for referance
     def __init__(self, title):
         self.aspectRatioValue = "16/9"
 
@@ -150,6 +151,17 @@ class MenConstruct:
         #find file in filesystem
         #run mplayer
         #mplayer $MOVIENAME.mpg -vf cropdetect -ss 00:00:07 -endpos 00:00:03
+
+    def __init__(self):
+
+        #set some basic settings
+        self.set_file_paths()
+
+        #Manditory List of things
+        self.crop_info_entered = False
+        self.end_pos_entered = False
+        self.aspect_ratio_entered = False
+
 
     def set_file_paths(self):
         self.originFile = referanceFilePath + str(self.title) + ".mpg"
@@ -180,12 +192,16 @@ class MenConstruct:
         #First get eof
         #mediainfo --Inform="General;%Duration%" try2.mpg
         # temp = os.system('mediainfo --Inform="General;%Duration%" ' + str(user) + ".mpg")
-        temp = os.popen('mediainfo --Inform="General;%Duration%" ' + str(self.originFile)).read()
-        self.totalFileDurationSec = round(float(temp) / 1000,0)
-        print("temp as rounded " + str(temp))
+
 
         self.endPosition = self.end_position_automatically()
         #second get blackscreen data... will need to analyze file to decide the end of the credits
+
+    def find_end_pos(self):
+        temp = os.popen('mediainfo --Inform="General;%Duration%" ' + str(self.originFile)).read()
+        self.totalFileDurationSec = round(float(temp) / 1000,0)
+        print("temp as rounded " + str(temp))
+        return str(temp)
 
 
     def run_mencoder(self):
@@ -227,23 +243,19 @@ class MenConstruct:
         return timestring
 
 
-    def set_aspect_ratio(self):
-        print("Pick aspect ratio: ")
-        print("1)  4/3")
-        print("2)  16/9")
-        print("3)  even wider!")
-        choice = input("Select: ")
-        if choice == "1":
+    def set_aspect_ratio(self, choice):
+        #updated for GUI
+        #accepts choice as a string.  It must match an available option
+
+        choice = choice
+        if choice == "4/3":
             self.aspectRatioValue = "4/3"
-        elif choice == "2":
+        elif choice == "16/9":
             self.aspectRatioValue = "16/9"
-        elif choice == "3":
+        elif choice == "1.85/1":
             self.aspectRatioValue = "1.85/1"
         else:
             self.aspectRatioValue = "16/9"
-
-
-
 
     def convertSecToTime(self, time_number):
         time_string = str(time_number)
