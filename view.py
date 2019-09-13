@@ -192,6 +192,7 @@ class ConvertSettingsPage(tk.Frame):
         #LARGE_FONT defined above
         self.tkObj = tkObj
         self.parent = parent
+        self.boxCurrentMovieSelected = "None"
         tk.label = tk.Label(self, bg = "teal", text = "Convert Settings and Inputs")
         tk.label.pack()
 
@@ -199,38 +200,71 @@ class ConvertSettingsPage(tk.Frame):
         self.createRawMovieListBox()
 
         #Listbox for Aspect Ratio
+        # self.aspectRatioFrame()
+        self.aspectRatioFrameRadioButtons()
+
+        enterButt = tk.Button(self, text="ENTER", bg="teal", command=self.enterButton)
+        butt = tk.Button(self, text="Change to Start Page", bg="teal", command=self.func1)
+
+        enterButt.pack()
+        butt.pack()
+
+    def func1(self):
+        self.tkObj.showFrame(StartPage)
+
+    def enterButton(self):
+        #check Critera are selected
+        if (True):
+            #set aspect Ratio, Movie Title, other
+            print(self.aspectRatio.get())
+            print(self.boxCurrentMovieSelected)
+
+
+    #initiallizer Function
+    def aspectRatioFrame(self):
         aspectInput = tk.Listbox(self)
         aspectInput.insert(tk.END, "4/3")
         aspectInput.insert(tk.END, "16/9")
         aspectInput.insert(tk.END, "1.85/1")
         enterButton = tk.Button(self, text="Enter")
         a = aspectInput.bind("<Double-Button-1>", aspectInput.get(tk.ACTIVE))
-        print(a)
-
         aspectInput.pack()
         enterButton.pack()
 
+    #initiallizer Function
+    def aspectRatioFrameRadioButtons(self):
+        self.aspectRatio = tk.StringVar()
+        for i in ("4/3", "16/9", "1.85/1"):
+            tk.Radiobutton(self, text=i, variable=self.aspectRatio, value=i).pack(anchor=tk.W)
 
-        butt = tk.Button(self, text="Change to Start Page", bg="teal", command=self.func1)
-        butt.pack()
-
-    def func1(self):
-        self.tkObj.showFrame(StartPage)
-
+    #initiallizer Function
     def createRawMovieListBox(self):
+        self.movieSelection = tk.Label(self, bg = "yellow", text = self.boxCurrentMovieSelected)
         self.convertListBox = tk.Listbox(self)
-        self.convertListBox.bind("<Double-Button-1>", self.setMovieTitle)
-
+        # self.convertListBox.bind("<Double-Button-1>", self.setMovieTitle)
+        self.convertListBox.bind("<Double-Button-1>", self.highlightMovieTitle)
         #add items to listbox
         movieList = self.tkObj.appController.getRawMovieFileList()
         for item in movieList:
             self.convertListBox.insert(tk.END, item)
-
         #TODO
         #createFileList
-
+        self.movieSelection.pack()
         self.convertListBox.pack()
 
+    #Event
+    def highlightMovieTitle(self, event):
+        widget = event.widget
+        selection=widget.curselection()
+        movieTitle = widget.get(selection[0])
+        self.boxCurrentMovieSelected = movieTitle
+        #Update the text for self.movieSelection
+        self.movieSelection.config(text = self.boxCurrentMovieSelected)
+        # self.movieSelection.pack_forget()
+        # self.movieSelection.pack()
+
+
+    #Event
     def setMovieTitle(self, event):
         #Todo - Move to another class...???
             widget = event.widget

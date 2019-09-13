@@ -28,6 +28,7 @@ class AppController():
         return self.model.getRawMovieFileList()
 
     def setMovieTitle(self, title):
+        #when the view picks a title, this passes it to the model to process
         self.model.setMovieTitle(title)
         print(title)
 
