@@ -4,6 +4,7 @@ import os
 import subprocess
 from pathlib import Path
 import tempfile
+import time
 
 import controller
 from configurations import *
@@ -14,11 +15,32 @@ from os import listdir
 from os.path import isfile, join
 onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
 
+#Configurations import more formally than above
+outputHelperFilePath = VHS_OUTPUT_FILEPATH
+rawVHSFilepath = RAW_VHS_FILEPATH #mypath above should be changed as it is redundant
+finishedFilePath = FINISHED_VHS_FILEPATH
+referanceFilePath = REFERENCE_FILES_FILEPATH
+cropDetectTimeRange = MPLAYERRANGE
+
+
 # Model class here, basically MenConstruct class
 class Model:
 
+
+
     def __init__(self):
-        self.referanceFilePathOriginalMovies = referanceFilePath
+        #Things that are needed to convert a movie
+        self.movieTitle = False
+        self.aspect_ratio_entered = False
+        self.crop_info_entered = False
+        # self.end_pos_entered = False
+        self.end_pos_of_file = False
+        self.endPosString = False
+        self.originFile = False
+        self.finishedFile = False
+        # self.finishedFile = referanceFilePathOutputFiles + str(self.title) + "VHS.avi"
+
+        # self.referanceFilePathOriginalMovies = referanceFilePath
 
     def functionRecord(self):
         #record Function
@@ -42,38 +64,43 @@ class Model:
 
         self.stallFunction()
 
+    def movieConstruct(self, movieChoice):
+        self.movieTitle = self.convertMovieToTitle(movieChoice)
+        self.setFilePaths()
+        self.getEndOfFile(movieChoice)
 
-    def functionConvert(event):
+
+    def functionConvert(self, movieChoice, aspectRatio, endPos):
         #convert function
+        #TODO - change endOfFile input to user selected stopping point
 
-        #This was the listbox select to get the movieTitle.  Change this.  Todo
-        self.widget = event.widget
-        self.selection=self.widget.curselection()
-        self.value = self.widget.get(self.selection[0])
-        self.movieTitle = self.value
+        self.aspect_ratio_entered = aspectRatio
+        # self.crop_info_entered
+        self.endPosString = self.userToTimeString(endPos)
+        self.setCropInfo()
+
+        #get inputs
+        #Todo the line below is redundant
+        # self.end_pos_of_file = self.end_pos_entered #end position of file is a weird concept because nothing is finalized until the convert function is called
+
+        #Test inputs
+        print(self.movieTitle)
+        print(self.aspect_ratio_entered )
+        print(self.crop_info_entered)#
+        print(self.end_pos_of_file )
+        print(self.endPosString)
+        print(self.originFile)#
+        print(self.finishedFile)
+        if(self.testInputValuesForMencoder()):
+            print("about to run mencoder")
+            self.runMencoder()
+            print("Done with mencoder")
 
 
-        #Try to construct MenConstruct without inputs and get inputs one by one as programically makes sense
-        theMovie = MenConstruct(movieTitle)
-
-        #use variable setters for stuff here
-                # self.crop_info_entered = False
-                # self.end_pos_entered = False
-                # self.aspect_ratio_entered = False
-
-        #Find the end position and feed to front end?
-        self.end_pos = theMovie.find_end_pos()
-
-        #set crop info
-        cropEntry = False
-        theMovie.set_crop_info(cropEntry)
-
-
-        stallFunction()
 
     def functionPlay():
         #Play Function
-        stallFunction()
+        self.stallFunction()
 
     def functionTest1():
         #test
@@ -84,7 +111,7 @@ class Model:
         self.temp = os.popen('mediainfo --Inform="General;%Duration%" ' + str(self.user) + ".mpg").read()
         self.temp = round(float(self.temp) / 1000,0)
         print("self.temp as rounded " + str(self.temp))
-        stallFunction()
+
 
     def functionTest2():
         #test2
@@ -102,10 +129,10 @@ class Model:
                 print(temp2[0])
 
 
-        stallFunction()
 
 
-    def stallFunction():
+
+    def stallFunction(self):
         #literally stalls the function
         continue1 = True
         continue1 = input("This is the Stall Function.  Press a key")
@@ -133,6 +160,143 @@ class Model:
 
     def setMovieTitle(self, movie):
         print("In the thing")
+
+    #Conversion Helper Functions
+    def setCropInfo(self):
+        # command = "mplayer " + self.originFile + " -vf cropdetect -benchmark -nosound -vo null -ss {} -endpos {}".format(cropDetectTimeRange[0], cropDetectTimeRange[1])
+        command = "mplayer " + self.originFile + " -vf cropdetect -benchmark -nosound -vo null -endpos {}".format(cropDetectTimeRange[1])
+        command += " | tee " + outputHelperFilePath + "movieData.txt"
+        print(command)
+        output = os.system(command)
+        #LOTR example should be 720:480?
+        print("Pausing")
+        time.sleep(2)
+
+        #extract data from mplayer
+        #open mplayers cropdetect output file
+        self.file_object = open(outputHelperFilePath + "movieData.txt", 'r')
+        self.cropStringValue=["",0]
+        for line in self.file_object:
+            #Read a line
+            #extract actual crop value from file
+            if "-vf crop=" in line:
+                temp = line.split("crop=")
+                cropStringInstance = temp[1].split(")")
+                if str(cropStringInstance[0]) != str(self.cropStringValue[0]):
+                    #compare instance to existing
+                    #todo - would it be better to use an average or median here?
+                    self.cropStringValue[0] = cropStringInstance[0]
+                    self.cropStringValue[1] = self.cropStringValue[1] + 1
+
+        self.crop_info_entered = self.cropStringValue[0]
+
+        # #treat it as a string
+        # output = os.system(command)
+        # print(output)
+        # self.cropStringValue=["",0]
+        # for line in output:
+        #     #Read a line
+        #     #extract actual crop value from file
+        #     if "-vf crop=" in line:
+        #         temp = line.split("crop=")
+        #         cropStringInstance = temp[1].split(")")
+        #         if str(cropStringInstance[0]) != str(self.cropStringValue[0]):
+        #             #compare instance to existing
+        #             #todo - would it be better to use an average or median here?
+        #             self.cropStringValue[0] = cropStringInstance[0]
+        #             self.cropStringValue[1] = self.cropStringValue[1] + 1
+        # print("exiting setCropInfo")
+
+    def getEndOfFile(self, movieChoice):
+        movieFilePath = rawVHSFilepath + movieChoice
+        temp = os.popen('mediainfo --Inform="General;%Duration%" ' + str(movieFilePath)).read()
+        self.totalFileDurationSec = round(float(temp) / 1000,0)
+        # print("temp as rounded " + str(temp))
+        self.end_pos_of_file = temp
+        return str(temp)
+
+    def convertMovieToTitle(self, movieChoice):
+        if (movieChoice[-4:] == ".mpg"):
+            print("yeah")
+            return movieChoice[:-4]
+        else:
+            return False
+
+    def setFilePaths(self):
+        self.originFile = rawVHSFilepath + str(self.movieTitle) + ".mpg"
+        self.finishedFile = finishedFilePath + str(self.movieTitle) + "VHS.avi"
+
+    def testInputValuesForMencoder(self):
+                # self.movieTitle = False
+                # self.aspect_ratio_entered = False
+                # self.crop_info_entered = False
+                # self.end_pos_entered = False
+                # self.end_pos_of_file = False
+                #
+                # self.originFile = False
+        if(self.movieTitle and self.aspect_ratio_entered and self.crop_info_entered and self.originFile and self.finishedFile):
+            return True
+
+    def convertSecToTime(self, time_number):
+        #Starts as a number in seconds turns to time string
+        time_string = str(time_number)
+        h = int(time_number)//3600
+        time_number = time_number % 3600
+        m = int(time_number)//60
+        time_number = time_number % 60
+        s = int(time_number)
+        #convert to string
+        if(h<10):
+            h = str(0) + str(h)
+        else:
+            h= str(h)
+        if(m<10):
+            m = str(0) + str(m)
+        else:
+            m = str(m)
+        if(s<10):
+            s=str(0) +str(s)
+        else:
+            s=str(s)
+        #self.d= h + ":" + m + ":" + s
+        return str(h) + ":" + str(m) + ":" + str(s)
+
+    def userToTimeString(self, user):
+        #test user values and make a proper string
+        #starts as a dictionary of hours, minutes, seconds
+        print(type(int(user["hours"])) is int)
+        if(type(int(user["hours"])) is int and type(int(user["minutes"])) is int and type(int(user["seconds"])) is int ):
+            hours = (user["hours"])
+
+            minutes = int(user["minutes"])
+            if int(minutes) >= 60:
+                hours += minutes / 60
+                minutes = minutes % 60
+
+            seconds = int(user["seconds"])
+            if int(seconds) > 60:
+                minutes += seconds / 60
+                seconds = seconds % 60
+
+            return str(hours) + ":" + str(minutes) + ":" + str(seconds)
+
+        else:
+            print("bad user string")
+            return False
+
+    def runMencoder(self):
+        # mencoderCommand = "mencoder {originalFile} -oac mp3lame -lavcopts vcodec=msmpeg4v2:aspect={aspectValue} -ovc lavc -lavcopts vbitrate=2000000 -vf crop={cropValue},scale=512:384 -endpos {endPos} -o {finishedFileThis}".format(originalFile=str(self.originFile),aspectValue=str(self.aspect_ratio_entered),cropValue=str(self.crop_info_entered),endPos=str(self.endPosString),finishedFileThis=str(self.finishedFile))
+        # self.crop_info_entered = "720:480:0:0"
+        mencoderCommand = "mencoder {originalFile} -oac mp3lame -lavcopts vcodec=msmpeg4v2:aspect={aspectValue} -ovc lavc -lavcopts vbitrate=2000000 -vf crop={cropValue},scale=512:384 -endpos {endPos} -o {finishedFileThis}".format(originalFile=str(self.originFile),aspectValue=str(self.aspect_ratio_entered),cropValue=str(self.crop_info_entered),endPos=str(self.endPosString),finishedFileThis=str(self.finishedFile))
+
+        print(mencoderCommand)
+        time.sleep(2)
+        # input(mencoderCommand)
+        os.system(mencoderCommand)
+
+
+
+
 
 class MenConstruct:
 

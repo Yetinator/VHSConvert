@@ -8,6 +8,8 @@ import tkinter as tk
 
 import controller
 from configurations import *
+from convertSettingsPage import *
+from movieSelectionPage import *
 
 class View(tk.Tk):
 
@@ -20,13 +22,14 @@ class View(tk.Tk):
 
     # def __init__(self, parent, controller):
     def __init__(self):
-
+        self.pageList = (StartPage, PageTwo, ConvertSettingsPage, MovieSelectionPage)
         #Wtf is the parent here?
         # self.controller = controller
         self.appController = controller.AppController()
         tk.Tk.__init__(self)
         self.geometry(SCREEN_GEOMETRY)
         self.createInterfaceBase()
+        self.title("VHS Converter")
 
 
 
@@ -86,8 +89,8 @@ class View(tk.Tk):
     #Initialize Frames
     def createFrames(self):
         self.frames = {}
-        for F in (StartPage, PageTwo, ConvertSettingsPage):
-            frame = F(self.frameRandom, self)
+        for F in (self.pageList):
+            frame = F(self.frameRandom, self, self.appController)
             self.frames[F] = frame
             frame.grid(row=0,column=0,sticky="nsew")
         # self.frames = StartPage(self.frameRandom, self)
@@ -124,7 +127,8 @@ class View(tk.Tk):
     def functionConvert(self):
 
         #show the settings page and run some of the code
-        self.showFrame(ConvertSettingsPage)
+        # self.showFrame(ConvertSettingsPage)
+        self.showFrame(MovieSelectionPage)
 
     def functionPlay(self):
         pass
@@ -135,13 +139,19 @@ class View(tk.Tk):
     def functionTest2(self):
         self.showFrame(PageTwo)
 
+    def convertSettings(self):
+        #bad name, switch to convertSettingsPage
+        self.frames[ConvertSettingsPage].refresh()
+        self.showFrame(ConvertSettingsPage)
+
 class StartPage(tk.Frame):
 
-    def __init__(self, parent, tkObj):
+    def __init__(self, parent, tkObj, appController):
         #the parent is a tk.Tk instance called root?
         tk.Frame.__init__(self, parent)
         self.tkObj = tkObj
         self.parent = parent
+        self.appController = appController
         #LARGE_FONT defined above
         label = tk.Label(self, text = "What the?")
         label.pack()
@@ -162,10 +172,11 @@ class StartPage(tk.Frame):
 
 class PageTwo(tk.Frame):
 
-    def __init__(self, parent, tkObj):
+    def __init__(self, parent, tkObj, appController):
         tk.Frame.__init__(self, parent)
         self.tkObj = tkObj
         self.parent = parent
+        self.appController = appController
         #LARGE_FONT defined above
         label = tk.Label(self, text = "Second?")
         label.pack()
@@ -183,104 +194,7 @@ class PageTwo(tk.Frame):
         # self.controller.showFrame(PageThree)
         pass
 
-class ConvertSettingsPage(tk.Frame):
 
-    def __init__(self, parent, tkObj):
-        #the parent for the above frame was an object that inherited from tk.Tk root window
-        #but in this case...
-        tk.Frame.__init__(self, parent)
-        #LARGE_FONT defined above
-        self.tkObj = tkObj
-        self.parent = parent
-        self.boxCurrentMovieSelected = "None"
-        tk.label = tk.Label(self, bg = "teal", text = "Convert Settings and Inputs")
-        tk.label.pack()
-
-        #Listbox for Movie
-        self.createRawMovieListBox()
-
-        #Listbox for Aspect Ratio
-        # self.aspectRatioFrame()
-        self.aspectRatioFrameRadioButtons()
-
-        enterButt = tk.Button(self, text="ENTER", bg="teal", command=self.enterButton)
-        butt = tk.Button(self, text="Change to Start Page", bg="teal", command=self.func1)
-
-        enterButt.pack()
-        butt.pack()
-
-    def func1(self):
-        self.tkObj.showFrame(StartPage)
-
-    def enterButton(self):
-        #check Critera are selected
-        if (True):
-            #set aspect Ratio, Movie Title, other
-            print(self.aspectRatio.get())
-            print(self.boxCurrentMovieSelected)
-
-
-    #initiallizer Function
-    def aspectRatioFrame(self):
-        aspectInput = tk.Listbox(self)
-        aspectInput.insert(tk.END, "4/3")
-        aspectInput.insert(tk.END, "16/9")
-        aspectInput.insert(tk.END, "1.85/1")
-        enterButton = tk.Button(self, text="Enter")
-        a = aspectInput.bind("<Double-Button-1>", aspectInput.get(tk.ACTIVE))
-        aspectInput.pack()
-        enterButton.pack()
-
-    #initiallizer Function
-    def aspectRatioFrameRadioButtons(self):
-        self.aspectRatio = tk.StringVar()
-        for i in ("4/3", "16/9", "1.85/1"):
-            tk.Radiobutton(self, text=i, variable=self.aspectRatio, value=i).pack(anchor=tk.W)
-
-    #initiallizer Function
-    def createRawMovieListBox(self):
-        self.movieSelection = tk.Label(self, bg = "yellow", text = self.boxCurrentMovieSelected)
-        self.convertListBox = tk.Listbox(self)
-        # self.convertListBox.bind("<Double-Button-1>", self.setMovieTitle)
-        self.convertListBox.bind("<Double-Button-1>", self.highlightMovieTitle)
-        #add items to listbox
-        movieList = self.tkObj.appController.getRawMovieFileList()
-        for item in movieList:
-            self.convertListBox.insert(tk.END, item)
-        #TODO
-        #createFileList
-        self.movieSelection.pack()
-        self.convertListBox.pack()
-
-    #Event
-    def highlightMovieTitle(self, event):
-        widget = event.widget
-        selection=widget.curselection()
-        movieTitle = widget.get(selection[0])
-        self.boxCurrentMovieSelected = movieTitle
-        #Update the text for self.movieSelection
-        self.movieSelection.config(text = self.boxCurrentMovieSelected)
-        # self.movieSelection.pack_forget()
-        # self.movieSelection.pack()
-
-
-    #Event
-    def setMovieTitle(self, event):
-        #Todo - Move to another class...???
-            widget = event.widget
-            selection=widget.curselection()
-            movieTitle = widget.get(selection[0])
-            self.tkObj.appController.setMovieTitle(movieTitle)
-            return movieTitle
-
-
-# def main():
-#     root = tk.Tk()
-#     root.title("VHS Conversion")
-#     # root.geometry(screen_geometry)
-#     #View(root)
-#     View(root)
-#     root.mainloop()
 
 
 #start the app
