@@ -14,15 +14,13 @@ class MovieSelectionPage(tk.Frame):
         self.parent = parent
         self.appController = appController
         self.boxCurrentMovieSelected = "None"
+        
         tk.label = tk.Label(self, bg = "teal", text = "Convert Settings and Inputs")
         tk.label.pack()
 
         #Listbox for Movie
         self.createRawMovieListBox()
 
-        #Listbox for Aspect Ratio
-        # self.aspectRatioFrame()
-        # self.aspectRatioFrameRadioButtons()
 
         enterButt = tk.Button(self, text="Select Movie", bg="teal", command=self.enterButton)
         enterButt.pack()
@@ -64,7 +62,7 @@ class MovieSelectionPage(tk.Frame):
 
     #initiallizer Function
     def createRawMovieListBox(self):
-        self.movieSelection = tk.Label(self, bg = "yellow", text = self.boxCurrentMovieSelected)
+        # self.movieSelection = tk.Label(self, bg = "yellow", text = self.boxCurrentMovieSelected)
         self.convertListBox = tk.Listbox(self)
         # self.convertListBox.bind("<Double-Button-1>", self.highlightMovieTitle)
         #add items to listbox
@@ -73,8 +71,9 @@ class MovieSelectionPage(tk.Frame):
             self.convertListBox.insert(tk.END, item)
         #TODO
         #createFileList
-        self.movieSelection.pack()
+        # self.movieSelection.pack()
         self.convertListBox.pack()
+
 
     #Event
     def setMovieTitle(self, event):

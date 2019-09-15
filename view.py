@@ -10,6 +10,7 @@ import controller
 from configurations import *
 from convertSettingsPage import *
 from movieSelectionPage import *
+from playPage import *
 
 class View(tk.Tk):
 
@@ -22,7 +23,7 @@ class View(tk.Tk):
 
     # def __init__(self, parent, controller):
     def __init__(self):
-        self.pageList = (StartPage, PageTwo, ConvertSettingsPage, MovieSelectionPage)
+        self.pageList = (StartPage, PageTwo, ConvertSettingsPage, MovieSelectionPage, PlayPage)
         #Wtf is the parent here?
         # self.controller = controller
         self.appController = controller.AppController()
@@ -131,7 +132,7 @@ class View(tk.Tk):
         self.showFrame(MovieSelectionPage)
 
     def functionPlay(self):
-        pass
+        self.showFrame(PlayPage)
 
     def functionTest1(self):
         self.showFrame(StartPage)

@@ -1,6 +1,7 @@
 import tkinter as tk
 import controller
 from configurations import *
+from troubleshooting import *
 
 
 class PlayPage(tk.Frame):
@@ -18,7 +19,7 @@ class PlayPage(tk.Frame):
         tk.label.pack()
 
         #Listbox for Movie
-        self.createRawMovieListBox()
+        self.createTheMovieListBox()
 
         #Listbox for Aspect Ratio
         # self.aspectRatioFrame()
@@ -38,11 +39,18 @@ class PlayPage(tk.Frame):
         # # movieChoice = self.boxCurrentMovieSelected
         movieChoice = self.watchListBox.get(self.watchListBox.curselection())
         # print(type(self.tkObj.showFrame(self.tkObj.frames[ConvertSettingsPage])))
+
+        waldo("movieChoice ", movieChoice)
         # self.appController.setCurrentMovieSelected(movieChoice)
+        # self.appController.setMovieToPlay(movieChoice)
+
         # self.tkObj.convertSettings()
+
         # if (True):
         #     #set aspect Ratio, Movie Title, other
         #     self.appController.convertMovie(movieChoice, aspectRatio)
+        self.appController.playFile(movieChoice, False)
+
 
 
     #initiallizer Function
@@ -63,17 +71,25 @@ class PlayPage(tk.Frame):
             tk.Radiobutton(self, text=i, variable=self.aspectRatio, value=i).pack(anchor=tk.W)
 
     #initiallizer Function
-    def createRawMovieListBox(self):
-        self.movieSelection = tk.Label(self, bg = "yellow", text = self.boxCurrentMovieSelected)
+    def createTheMovieListBox(self):
+        # self.movieSelection = tk.Label(self, bg = "yellow", text = self.boxCurrentMovieSelected)
+
         self.watchListBox = tk.Listbox(self)
         # self.watchListBox.bind("<Double-Button-1>", self.highlightMovieTitle)
         #add items to listbox
-        movieList = self.tkObj.appController.getRawMovieFileList()
+        if(False):
+            movieList = self.tkObj.appController.getRawMovieFileList()
+
+        else:
+            movieList = self.tkObj.appController.getFinishedMovieFileList()
+            print(movieList)
+
         for item in movieList:
             self.watchListBox.insert(tk.END, item)
+
         #TODO
         #createFileList
-        self.movieSelection.pack()
+        # self.movieSelection.pack()
         self.watchListBox.pack()
 
     #Event

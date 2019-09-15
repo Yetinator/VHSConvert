@@ -17,6 +17,7 @@ class ConvertSettingsPage(tk.Frame):
         self.parent = parent
         self.appController = appController
         self.boxCurrentMovieSelected = "None"
+
         label = tk.Label(self, bg = "teal", text = "Convert Settings and Inputs")
         label.pack()
 
@@ -59,6 +60,9 @@ class ConvertSettingsPage(tk.Frame):
             #set aspect Ratio, Movie Title, other
             self.appController.convertMovie(self.movieChoice, aspectRatio, self.endOfMovieUser)
 
+    def playButton(self):
+        self.appController.playMovieForEndTime(self.movieChoice)
+
 
     #initiallizer Function
     def aspectRatioFrame(self):
@@ -92,19 +96,19 @@ class ConvertSettingsPage(tk.Frame):
         self.inputBoxMinutes = tk.Entry(inputFrame, text = "Minutes")
         self.inputBoxSeconds = tk.Entry(inputFrame, text = "Seconds")
 
+        #this calls mplayer to navigate to the end of the movie and make finding the end awesome
+        playMovie = tk.Button(self, text="Play a Clip to find the end", bg="teal", command=self.playButton)
+
         self.inputBoxHours.pack()
         self.inputBoxMinutes.pack()
         self.inputBoxSeconds.pack()
-        # label.pack(side=tk.LEFT)
-        # label2.pack(side=tk.RIGHT)
-        # self.LabelEndOfFile.pack(side=tk.LEFT)
-        # inputBox.pack(side=tk.RIGHT)
 
         label.pack()
         self.LabelEndOfFile.pack()
 
         label2.pack()
         inputFrame.pack()
+        playMovie.pack()
 
 
         #this does not collect info from appcontroller, that should have happened on refresh

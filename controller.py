@@ -1,5 +1,6 @@
 from configurations import *
 import model
+from troubleshooting import *
 
 class AppController():
 
@@ -24,6 +25,9 @@ class AppController():
         #passes the list of movies to the frontend from the back
         return self.model.getRawMovieFileList()
 
+    def getFinishedMovieFileList(self):
+        return self.model.getFinishedMovieFileList()
+
     def setMovieTitle(self, title):
         #when the view picks a title, this passes it to the model to process
 
@@ -33,8 +37,16 @@ class AppController():
     def setCurrentMovieSelected(self, movie):
 
         self.currentMovieSelected = movie
+        waldo("movie in controller ", movie)
         self.model.movieConstruct(movie)
         self.endOfFile = self.model.convertSecToTime(int(self.model.end_pos_of_file)/1000)
+        # self.endOfFile = self.model.end_pos_of_file
+
+    def setMovieToPlay(self, movie):
+        self.currentMovieSelected = movie
+        waldo("movie in controller movie to play", movie)
+        self.model.moviePlayConstruct(movie)
+        # self.endOfFile = self.model.convertSecToTime(int(self.model.end_pos_of_file)/1000)
         # self.endOfFile = self.model.end_pos_of_file
 
 
@@ -47,3 +59,9 @@ class AppController():
             endOfFile = self.model.getEndOfFile(movieChoice)
 
         self.model.functionConvert(movieChoice, aspectRatio, endOfFile)
+
+    def playFile(self, movie, originalBool):
+        self.model.playMovie(movie, originalBool)
+
+    def playMovieForEndTime(self, movie):
+        self.model.playMovieForEndTime(movie)

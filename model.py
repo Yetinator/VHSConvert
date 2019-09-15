@@ -5,6 +5,7 @@ import subprocess
 from pathlib import Path
 import tempfile
 import time
+from troubleshooting import *
 
 import controller
 from configurations import *
@@ -22,6 +23,13 @@ finishedFilePath = FINISHED_VHS_FILEPATH
 referanceFilePath = REFERENCE_FILES_FILEPATH
 cropDetectTimeRange = MPLAYERRANGE
 
+finishedFiles = [i for i in listdir(finishedFilePath) if isfile(join(finishedFilePath, i))]
+
+def waldo(variableName, variable):
+    print("\n")
+    print("----------------Where's waldo?----------------")
+    print("The value of " + variableName + " is: " + variable + " of type " + str(type(variable)))
+    print("\n")
 
 # Model class here, basically MenConstruct class
 class Model:
@@ -38,6 +46,8 @@ class Model:
         self.endPosString = False
         self.originFile = False
         self.finishedFile = False
+        self.movieSuffix = False
+        self.playFile = False
         # self.finishedFile = referanceFilePathOutputFiles + str(self.title) + "VHS.avi"
 
         # self.referanceFilePathOriginalMovies = referanceFilePath
@@ -67,7 +77,20 @@ class Model:
     def movieConstruct(self, movieChoice):
         self.movieTitle = self.convertMovieToTitle(movieChoice)
         self.setFilePaths()
+        waldo("self.movieTitle", self.movieTitle)
+        print("title of movie " + self.movieTitle)
+        print("movieChoice " + movieChoice)
+        print("type " + str(type(movieChoice)))
         self.getEndOfFile(movieChoice)
+
+    def moviePlayConstruct(self, movieChoice):
+        self.movieTitle = self.convertMovieToTitle(movieChoice)
+        self.setFilePaths()
+        waldo("self.movieTitle", self.movieTitle)
+        print("title of movie " + self.movieTitle)
+        print("movieChoice " + movieChoice)
+        print("type " + str(type(movieChoice)))
+        # self.getEndOfFile(movieChoice)
 
 
     def functionConvert(self, movieChoice, aspectRatio, endPos):
@@ -158,6 +181,13 @@ class Model:
             theList.append(item)
         return theList
 
+    def getFinishedMovieFileList(self):
+        theList = []
+        for item in finishedFiles:
+            theList.append(item)
+        return theList
+
+
     def setMovieTitle(self, movie):
         print("In the thing")
 
@@ -209,22 +239,54 @@ class Model:
 
     def getEndOfFile(self, movieChoice):
         movieFilePath = rawVHSFilepath + movieChoice
+        # movieFilePath = rawVHSFilepath + movieChoice
+        waldo("movieFilePath", movieFilePath)
+        #on a different system having trouble with usingPopopen?
+        #desktop version below
+
+        # temp = os.popen('mediainfo --Inform="General;%Duration%" ' + str(movieFilePath)).read()
+
+        #change for laptop
         temp = os.popen('mediainfo --Inform="General;%Duration%" ' + str(movieFilePath)).read()
+        waldo("temp", temp)
+
         self.totalFileDurationSec = round(float(temp) / 1000,0)
         # print("temp as rounded " + str(temp))
         self.end_pos_of_file = temp
         return str(temp)
 
     def convertMovieToTitle(self, movieChoice):
+        movieTitle = False
+
         if (movieChoice[-4:] == ".mpg"):
-            print("yeah")
-            return movieChoice[:-4]
-        else:
-            return False
+            self.movieSuffix = ".mpg"
+            movieTitle = movieChoice[:-4]
+
+
+        if (movieChoice[-4:] == ".avi"):
+            self.movieSuffix = ".avi"
+            movieTitle = movieChoice[:-4]
+
+        if (movieTitle[-3:] == "VHS"):
+            movieTitle = movieTitle[:-3]
+
+        return movieTitle
+
+
 
     def setFilePaths(self):
         self.originFile = rawVHSFilepath + str(self.movieTitle) + ".mpg"
         self.finishedFile = finishedFilePath + str(self.movieTitle) + "VHS.avi"
+
+    def setPlayFilePath(self, movie, originalBool = False):
+        #change movie to movieTitle
+        movieTitle = self.convertMovieToTitle(movie)
+
+        if (originalBool == False):
+            self.playFile = rawVHSFilepath + str(movieTitle) + ".mpg"
+        if (originalBool == True):
+            self.playFile = finishedFilePath + str(movieTitle) + ".avi"
+
 
     def testInputValuesForMencoder(self):
                 # self.movieTitle = False
@@ -294,152 +356,175 @@ class Model:
         # input(mencoderCommand)
         os.system(mencoderCommand)
 
+    def playMovie(self, movie, originalBool = False):
+        #this needs handling for avg file
+        self.setPlayFilePath(movie, originalBool)
+        playCommand = "mplayer " + str(self.playFile)
+        os.system(playCommand)
+
+    def playMovieForEndTime(self, movie):
+        # self.setFilePaths()
+        self.movieConstruct(movie)
+        startTime = int(self.getEndOfFile(movie)) - 10
+        # playCommand = "mplayer " + str(self.originFile) + " -sstep 5 -ss {} -osdlevel 2 -fs ".format(str(startTime))
+        playCommand = "mplayer " + str(self.originFile) + " -osdlevel 2 -fs "
+        os.system(playCommand)
+
+
+        # mplayer try2.mpg -fs -osdlevel 2^C
+        #osdlevel means timer
+        #arrow keys skip time
+        #-ss start time
+        # -sstep skips frames in seconds
 
 
 
 
-class MenConstruct:
-
-    #the first initiallizer is devalued and only here for referance
-    def __init__(self, title):
-        self.aspectRatioValue = "16/9"
-
-        #self.title =  input("Enter a movieTitle: ")
-        self.title = title[:-4]
-
-        self.set_file_paths()
-        self.set_crop_info()
-        self.set_end_pos()
-        self.set_aspect_ratio()
-        self.run_mencoder()
-        #find file in filesystem
-        #run mplayer
-        #mplayer $MOVIENAME.mpg -vf cropdetect -ss 00:00:07 -endpos 00:00:03
-
-    def __init__(self):
-
-        #set some basic settings
-        self.set_file_paths()
-
-        #Manditory List of things
-        self.crop_info_entered = False
-        self.end_pos_entered = False
-        self.aspect_ratio_entered = False
 
 
-    def set_file_paths(self):
-        self.originFile = referanceFilePath + str(self.title) + ".mpg"
-        self.finishedFile = referanceFilePathOutputFiles + str(self.title) + "VHS.avi"
 
-    def set_crop_info(self):
-        command = "mplayer " + self.originFile + " -vf cropdetect -benchmark -nosound -vo null -ss {} -endpos {}".format(MPLAYERRANGE[0], MPLAYERRANGE[1])
-        output = os.system(command + " > movieData.txt")
-
-        #extract data from mplayer
-        #open mplayers cropdetect output file
-        self.file_object = open("movieData.txt", 'r')
-        self.cropStringValue=["",0]
-        for line in self.file_object:
-            #Read a line
-            #extract actual crop value from file
-            if "-vf crop=" in line:
-                temp = line.split("crop=")
-                cropStringInstance = temp[1].split(")")
-                if str(cropStringInstance[0]) != str(self.cropStringValue[0]):
-                    #compare instance to existing
-                    #todo - would it be better to use an average or median here?
-                    self.cropStringValue[0] = cropStringInstance[0]
-                    self.cropStringValue[1] = self.cropStringValue[1] + 1
-        print("exiting set_crop_info")
-
-    def set_end_pos(self):
-        #First get eof
-        #mediainfo --Inform="General;%Duration%" try2.mpg
-        # temp = os.system('mediainfo --Inform="General;%Duration%" ' + str(user) + ".mpg")
-
-
-        self.endPosition = self.end_position_automatically()
-        #second get blackscreen data... will need to analyze file to decide the end of the credits
-
-    def find_end_pos(self):
-        temp = os.popen('mediainfo --Inform="General;%Duration%" ' + str(self.originFile)).read()
-        self.totalFileDurationSec = round(float(temp) / 1000,0)
-        print("temp as rounded " + str(temp))
-        return str(temp)
-
-
-    def run_mencoder(self):
-        #run mencoder
-        mencoderCommand = "mencoder {originalFile} -oac mp3lame -lavcopts vcodec=msmpeg4v2:aspect={aspectValue} -ovc lavc -lavcopts vbitrate=2000000 -vf crop={cropValue},scale=512:384 -endpos {endPos} -o {finishedFileThis}".format(originalFile=str(self.originFile),aspectValue=str(self.aspectRatioValue),cropValue=str(self.cropStringValue[0]),endPos=str(self.endPosition),finishedFileThis=str(self.finishedFile))
-        a = input("waiting")
-        input(mencoderCommand)
-        os.system(mencoderCommand)
-
-    def end_position_manually(self):
-        #"00:00:03"
-        valuePass = False
-        print("The duration of the video is :")
-        x = self.totalFileDurationSec
-        print(str(x))
-        timestring = self.convertSecToTime(x)
-        print(timestring)
-        temp = input("what is the end time in hh:mm:ss ")
-        testingValuesList = temp.split(":")
-        for item in testingValuesList:
-            if len(item) == 2:
-                if int(item) < 100:
-                    if int(item) > 9:
-                        valuePass = True
-        if valuePass == True:
-            return temp
-        else:
-            print("bad endpPos value!!!!!")
-            return "00:00:01"
-
-    def end_position_automatically(self):
-        #"00:00:03"
-        valuePass = False
-
-        x = self.totalFileDurationSec
-
-        timestring = self.convertSecToTime(x)
-        print(timestring)
-        return timestring
-
-
-    def set_aspect_ratio(self, choice):
-        #updated for GUI
-        #accepts choice as a string.  It must match an available option
-
-        choice = choice
-        if choice == "4/3":
-            self.aspectRatioValue = "4/3"
-        elif choice == "16/9":
-            self.aspectRatioValue = "16/9"
-        elif choice == "1.85/1":
-            self.aspectRatioValue = "1.85/1"
-        else:
-            self.aspectRatioValue = "16/9"
-
-    def convertSecToTime(self, time_number):
-        time_string = str(time_number)
-        h = int(time_number)//3600
-        time_number = time_number % 3600
-        m = int(time_number)//60
-        time_number = time_number % 60
-        s = int(time_number)
-        #convert to string
-        if(h<10):
-            h = str(0) + str(h)
-        else:
-            h= str(h)
-        if(m<10):
-            m = str(0) + str(m)
-        else:
-            m = str(m)
-        if(s<10):
-            s=str(0) +str(s)
-        else:
-            s=str(s)
-        #self.d= h + ":" + m + ":" + s
-        return str(h) + ":" + str(m) + ":" + str(s)
+# class MenConstruct:
+#
+#     #the first initiallizer is devalued and only here for referance
+#     def __init__(self, title):
+#         self.aspectRatioValue = "16/9"
+#
+#         #self.title =  input("Enter a movieTitle: ")
+#         self.title = title[:-4]
+#
+#         self.set_file_paths()
+#         self.set_crop_info()
+#         self.set_end_pos()
+#         self.set_aspect_ratio()
+#         self.run_mencoder()
+#         #find file in filesystem
+#         #run mplayer
+#         #mplayer $MOVIENAME.mpg -vf cropdetect -ss 00:00:07 -endpos 00:00:03
+#
+#     def __init__(self):
+#
+#         #set some basic settings
+#         self.set_file_paths()
+#
+#         #Manditory List of things
+#         self.crop_info_entered = False
+#         self.end_pos_entered = False
+#         self.aspect_ratio_entered = False
+#
+#
+#     def set_file_paths(self):
+#         self.originFile = referanceFilePath + str(self.title) + ".mpg"
+#         self.finishedFile = referanceFilePathOutputFiles + str(self.title) + "VHS.avi"
+#
+#     def set_crop_info(self):
+#         command = "mplayer " + self.originFile + " -vf cropdetect -benchmark -nosound -vo null -ss {} -endpos {}".format(MPLAYERRANGE[0], MPLAYERRANGE[1])
+#         output = os.system(command + " > movieData.txt")
+#
+#         #extract data from mplayer
+#         #open mplayers cropdetect output file
+#         self.file_object = open("movieData.txt", 'r')
+#         self.cropStringValue=["",0]
+#         for line in self.file_object:
+#             #Read a line
+#             #extract actual crop value from file
+#             if "-vf crop=" in line:
+#                 temp = line.split("crop=")
+#                 cropStringInstance = temp[1].split(")")
+#                 if str(cropStringInstance[0]) != str(self.cropStringValue[0]):
+#                     #compare instance to existing
+#                     #todo - would it be better to use an average or median here?
+#                     self.cropStringValue[0] = cropStringInstance[0]
+#                     self.cropStringValue[1] = self.cropStringValue[1] + 1
+#         print("exiting set_crop_info")
+#
+#     def set_end_pos(self):
+#         #First get eof
+#         #mediainfo --Inform="General;%Duration%" try2.mpg
+#         # temp = os.system('mediainfo --Inform="General;%Duration%" ' + str(user) + ".mpg")
+#
+#
+#         self.endPosition = self.end_position_automatically()
+#         #second get blackscreen data... will need to analyze file to decide the end of the credits
+#
+#     def find_end_pos(self):
+#         temp = os.popen('mediainfo --Inform="General;%Duration%" ' + str(self.originFile)).read()
+#         self.totalFileDurationSec = round(float(temp) / 1000,0)
+#         print("temp as rounded " + str(temp))
+#         return str(temp)
+#
+#
+#     def run_mencoder(self):
+#         #run mencoder
+#         mencoderCommand = "mencoder {originalFile} -oac mp3lame -lavcopts vcodec=msmpeg4v2:aspect={aspectValue} -ovc lavc -lavcopts vbitrate=2000000 -vf crop={cropValue},scale=512:384 -endpos {endPos} -o {finishedFileThis}".format(originalFile=str(self.originFile),aspectValue=str(self.aspectRatioValue),cropValue=str(self.cropStringValue[0]),endPos=str(self.endPosition),finishedFileThis=str(self.finishedFile))
+#         a = input("waiting")
+#         input(mencoderCommand)
+#         os.system(mencoderCommand)
+#
+#     def end_position_manually(self):
+#         #"00:00:03"
+#         valuePass = False
+#         print("The duration of the video is :")
+#         x = self.totalFileDurationSec
+#         print(str(x))
+#         timestring = self.convertSecToTime(x)
+#         print(timestring)
+#         temp = input("what is the end time in hh:mm:ss ")
+#         testingValuesList = temp.split(":")
+#         for item in testingValuesList:
+#             if len(item) == 2:
+#                 if int(item) < 100:
+#                     if int(item) > 9:
+#                         valuePass = True
+#         if valuePass == True:
+#             return temp
+#         else:
+#             print("bad endpPos value!!!!!")
+#             return "00:00:01"
+#
+#     def end_position_automatically(self):
+#         #"00:00:03"
+#         valuePass = False
+#
+#         x = self.totalFileDurationSec
+#
+#         timestring = self.convertSecToTime(x)
+#         print(timestring)
+#         return timestring
+#
+#
+#     def set_aspect_ratio(self, choice):
+#         #updated for GUI
+#         #accepts choice as a string.  It must match an available option
+#
+#         choice = choice
+#         if choice == "4/3":
+#             self.aspectRatioValue = "4/3"
+#         elif choice == "16/9":
+#             self.aspectRatioValue = "16/9"
+#         elif choice == "1.85/1":
+#             self.aspectRatioValue = "1.85/1"
+#         else:
+#             self.aspectRatioValue = "16/9"
+#
+#     def convertSecToTime(self, time_number):
+#         time_string = str(time_number)
+#         h = int(time_number)//3600
+#         time_number = time_number % 3600
+#         m = int(time_number)//60
+#         time_number = time_number % 60
+#         s = int(time_number)
+#         #convert to string
+#         if(h<10):
+#             h = str(0) + str(h)
+#         else:
+#             h= str(h)
+#         if(m<10):
+#             m = str(0) + str(m)
+#         else:
+#             m = str(m)
+#         if(s<10):
+#             s=str(0) +str(s)
+#         else:
+#             s=str(s)
+#         #self.d= h + ":" + m + ":" + s
+#         return str(h) + ":" + str(m) + ":" + str(s)
