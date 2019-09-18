@@ -12,7 +12,7 @@ from configurations import *
 from configurationsSystem import *
 
 #hocus pocus
-mypath = "/home/brian/Videos/RawVHSFiles"
+mypath = RAW_VHS_FILEPATH
 from os import listdir
 from os.path import isfile, join
 onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
@@ -412,7 +412,7 @@ class Model:
     def playMovie(self, movie, originalBool = False):
         #this needs handling for avg file
         self.setPlayFilePath(movie, originalBool)
-        playCommand = "mplayer " + str(self.playFile)
+        playCommand = "mplayer -vo gl-nosw" + str(self.playFile)
         os.system(playCommand)
 
     def playMovieForEndTime(self, movie):
@@ -420,7 +420,8 @@ class Model:
         self.movieConstruct(movie)
         startTime = int(self.getEndOfFile(movie)) - 10
         # playCommand = "mplayer " + str(self.originFile) + " -sstep 5 -ss {} -osdlevel 2 -fs ".format(str(startTime))
-        playCommand = "mplayer " + str(self.originFile) + " -osdlevel 2 -fs "
+        #playCommand = "mplayer -vo gl-nosw -osdlevel 2 -fs " + str(self.originFile)
+        playCommand = "mplayer -vo gl_nosw -osdlevel 2 -fs " + str(self.originFile)
         os.system(playCommand)
 
 
