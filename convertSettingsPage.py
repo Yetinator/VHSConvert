@@ -1,6 +1,8 @@
 import tkinter as tk
 import controller
 from configurations import *
+from configurationsSystem import *
+from troubleshooting import *
 
 
 class ConvertSettingsPage(tk.Frame):
@@ -59,27 +61,49 @@ class ConvertSettingsPage(tk.Frame):
         if (True):
             #set aspect Ratio, Movie Title, other
             self.appController.convertMovie(self.movieChoice, aspectRatio, self.endOfMovieUser)
+            self.tkObj.refresh()
 
     def playButton(self):
         self.appController.playMovieForEndTime(self.movieChoice)
 
 
     #initiallizer Function
-    def aspectRatioFrame(self):
-        aspectInput = tk.Listbox(self)
-        aspectInput.insert(tk.END, "4/3")
-        aspectInput.insert(tk.END, "16/9")
-        aspectInput.insert(tk.END, "1.85/1")
-        enterButton = tk.Button(self, text="Enter")
-        # a = aspectInput.bind("<Double-Button-1>", aspectInput.get(tk.ACTIVE))
-        aspectInput.pack()
-        enterButton.pack()
+    # def aspectRatioFrame(self):
+    #     aspectInput = tk.Listbox(self)
+    #     aspectInput.insert(tk.END, "4/3")
+    #     aspectInput.insert(tk.END, "16/9")
+    #     aspectInput.insert(tk.END, "1.85/1")
+    #     enterButton = tk.Button(self, text="Enter")
+    #     # a = aspectInput.bind("<Double-Button-1>", aspectInput.get(tk.ACTIVE))
+    #     aspectInput.pack()
+    #     enterButton.pack()
 
     #initiallizer Function
     def aspectRatioFrameRadioButtons(self):
+        # self.aspectRatio = tk.IntVar()
         self.aspectRatio = tk.StringVar()
-        for i in ("4/3", "16/9", "1.85/1"):
-            tk.Radiobutton(self, text=i, variable=self.aspectRatio, value=i).pack(anchor=tk.W)
+        # self.aspectDictionary = []
+        # for i in ("4/3", "16/9", "1.85/1"):
+        #     self.aspectDictionary.append(tk.Radiobutton(self, text=i, variable=self.aspectRatio, value=i).pack(anchor=tk.W))
+
+        self.buttonA = tk.Radiobutton(self, text="4/3", variable=self.aspectRatio, value="4/3")
+        self.buttonA.pack(anchor=tk.W)
+        self.buttonA.deselect()
+
+        self.buttonB = tk.Radiobutton(self, text="16/9", variable=self.aspectRatio, value="16/9")
+        self.buttonB.pack(anchor=tk.W)
+        self.buttonB.select()
+
+        self.buttonC = tk.Radiobutton(self, text="1.85/1", variable=self.aspectRatio, value="1.85/1")
+        self.buttonC.pack(anchor=tk.W)
+        self.buttonC.deselect()
+
+        # self.buttonB.set("16/9")
+
+        waldo("should be a radiobutton " , self.buttonB)
+
+
+
 
     def endPositionInfo(self):
         label = tk.Label(self, bg = "teal", text = "End of file")

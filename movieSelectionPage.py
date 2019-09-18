@@ -1,8 +1,9 @@
 import tkinter as tk
 import controller
 from configurations import *
+from configurationsSystem import *
 
-
+listBoxWidth = LIST_BOX_WIDTH
 class MovieSelectionPage(tk.Frame):
 
     def __init__(self, parent, tkObj, appController):
@@ -14,9 +15,9 @@ class MovieSelectionPage(tk.Frame):
         self.parent = parent
         self.appController = appController
         self.boxCurrentMovieSelected = "None"
-        
-        tk.label = tk.Label(self, bg = "teal", text = "Convert Settings and Inputs")
-        tk.label.pack()
+
+        label = tk.Label(self, bg = "teal", text = "Convert Settings and Inputs")
+        label.pack(fill=tk.X, expand=1)
 
         #Listbox for Movie
         self.createRawMovieListBox()
@@ -42,6 +43,9 @@ class MovieSelectionPage(tk.Frame):
         #     #set aspect Ratio, Movie Title, other
         #     self.appController.convertMovie(movieChoice, aspectRatio)
 
+    def refresh(self):
+        self.createRawMovieListBox()
+
 
     #initiallizer Function
     def aspectRatioFrame(self):
@@ -63,16 +67,18 @@ class MovieSelectionPage(tk.Frame):
     #initiallizer Function
     def createRawMovieListBox(self):
         # self.movieSelection = tk.Label(self, bg = "yellow", text = self.boxCurrentMovieSelected)
-        self.convertListBox = tk.Listbox(self)
+        self.convertListBox = tk.Listbox(self, width=listBoxWidth)
         # self.convertListBox.bind("<Double-Button-1>", self.highlightMovieTitle)
         #add items to listbox
-        movieList = self.tkObj.appController.getRawMovieFileList()
+        # movieList = self.tkObj.appController.getRawMovieFileList()
+        movieList = self.tkObj.appController.getUnconvertedMovieFileList()
+
         for item in movieList:
             self.convertListBox.insert(tk.END, item)
         #TODO
         #createFileList
         # self.movieSelection.pack()
-        self.convertListBox.pack()
+        self.convertListBox.pack(fill=tk.X, expand=1)
 
 
     #Event

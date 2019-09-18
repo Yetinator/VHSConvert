@@ -4,3 +4,4 @@
 dependencies
 mediainfo
 mplayer
+python3-tk

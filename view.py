@@ -1,13 +1,14 @@
 #this should make mencoder easy
 
 import os
-from menconstruct import MenConstruct
+# from menconstruct import MenConstruct
 import subprocess
 from pathlib import Path
 import tkinter as tk
 
 import controller
 from configurations import *
+from configurationsSystem import *
 from convertSettingsPage import *
 from movieSelectionPage import *
 from playPage import *
@@ -45,13 +46,14 @@ class View(tk.Tk):
     def createInterfaceBase(self):
         #create layout
         self.createTopMenu()
-        self.frameButtonPane = tk.Frame(self, width=200, bg="green")
+        self.frameButtonPane = tk.Frame(self, width=150, bg="green")
 
-        self.frameRandom = tk.Frame(self, width = 120, bg="red", relief=tk.SUNKEN)
+        self.frameRandom = tk.Frame(self, width = 400, bg="red", relief=tk.SUNKEN)
         self.createButtonPane(self.frameButtonPane)
 
         self.frameButtonPane.pack(side=tk.LEFT, fill=tk.X, expand=1)
-        self.frameRandom.pack(side=tk.RIGHT, fill=tk.BOTH, expand=1)
+        # self.frameRandom.pack(side=tk.RIGHT, fill=tk.BOTH, expand=1)
+        self.frameRandom.pack(side=tk.RIGHT, fill=tk.BOTH, expand=2)
 
     #Initializer Function
     def createTopMenu(self):
@@ -93,7 +95,7 @@ class View(tk.Tk):
         for F in (self.pageList):
             frame = F(self.frameRandom, self, self.appController)
             self.frames[F] = frame
-            frame.grid(row=0,column=0,sticky="nsew")
+            frame.grid(row=2,column=2, padx = 1, pady = 1, columnspan = 14, sticky="nsew")
         # self.frames = StartPage(self.frameRandom, self)
         # self.frames = PageTwo(self.frameRandom, self)
         self.showFrame(StartPage)
@@ -115,6 +117,14 @@ class View(tk.Tk):
     #Some Functions
     def exitProgram(self):
         exit()
+
+    def refresh(self):
+        self.appController.refresh()
+
+        for frame in self.frames:
+            del frame
+
+        self.createFrames()
 
     # def showFrame(self, cont):
     #     #looking at the frames list at position cont
@@ -160,8 +170,8 @@ class StartPage(tk.Frame):
         butt = tk.Button(self, text="Change to Page 2", bg="teal", command=self.func1)
         butt2 = tk.Button(self, text="Change to Page 3", bg="cyan", command=self.func2)
 
-        butt.pack()
-        butt2.pack()
+        butt.pack(fill=tk.X, expand=1)
+        butt2.pack(fill=tk.X, expand=1)
 
     def func1(self):
         self.tkObj.showFrame(PageTwo)

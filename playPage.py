@@ -1,6 +1,7 @@
 import tkinter as tk
 import controller
 from configurations import *
+from configurationsSystem import *
 from troubleshooting import *
 
 

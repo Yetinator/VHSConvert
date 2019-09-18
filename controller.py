@@ -1,4 +1,5 @@
 from configurations import *
+from configurationsSystem import *
 import model
 from troubleshooting import *
 
@@ -13,6 +14,9 @@ class AppController():
     def init_model(self):
         self.model = model.Model()
 
+    def refresh(self):
+        self.model.refresh()
+
 
 
     #Initializer Function
@@ -24,6 +28,30 @@ class AppController():
     def getRawMovieFileList(self):
         #passes the list of movies to the frontend from the back
         return self.model.getRawMovieFileList()
+
+    def getUnconvertedMovieFileList(self):
+        raw = self.model.getRawMovieFileList()
+        finished = self.model.getFinishedMovieFileList()
+        temp = []
+        #need handling for VHS.avi vs .mpg
+        for n in range(len(finished)):
+            finished[n] = finished[n][:-7]
+            print(finished[n])
+
+        raw2 = {}
+        for n in range(len(raw)):
+            raw2[n] = raw[n][:-4]
+            print("What?")
+
+        for n in raw2:
+            if (raw2[n] not in finished):
+                temp.append(raw[n])
+                print("movie not in " + str(n))
+            else:
+                print("IN: " + str(n))
+
+        return temp
+
 
     def getFinishedMovieFileList(self):
         return self.model.getFinishedMovieFileList()
