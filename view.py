@@ -11,6 +11,7 @@ from configurations import *
 from configurationsSystem import *
 from convertSettingsPage import *
 from movieSelectionPage import *
+from recordPage import *
 from playPage import *
 
 class View(tk.Tk):
@@ -24,7 +25,7 @@ class View(tk.Tk):
 
     # def __init__(self, parent, controller):
     def __init__(self):
-        self.pageList = (StartPage, PageTwo, ConvertSettingsPage, MovieSelectionPage, PlayPage)
+        self.pageList = (StartPage, PageTwo, ConvertSettingsPage, MovieSelectionPage, PlayPage, RecordPage)
         #Wtf is the parent here?
         # self.controller = controller
         self.appController = controller.AppController()
@@ -133,7 +134,7 @@ class View(tk.Tk):
 
     #Button functions below
     def functionRecord(self):
-        pass
+        self.showFrame(RecordPage)
 
     def functionConvert(self):
 

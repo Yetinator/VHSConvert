@@ -10,12 +10,8 @@ from troubleshooting import *
 import controller
 from configurations import *
 from configurationsSystem import *
-
-#hocus pocus
-mypath = "/home/brian/Videos/RawVHSFiles"
 from os import listdir
 from os.path import isfile, join
-onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
 
 #Configurations import more formally than above
 outputHelperFilePath = VHS_OUTPUT_FILEPATH
@@ -23,6 +19,7 @@ rawVHSFilepath = RAW_VHS_FILEPATH #mypath above should be changed as it is redun
 finishedFilePath = FINISHED_VHS_FILEPATH
 referanceFilePath = REFERENCE_FILES_FILEPATH
 cropDetectTimeRange = MPLAYERRANGE
+
 
 onlyfiles = [f for f in listdir(rawVHSFilepath) if isfile(join(rawVHSFilepath, f))]
 # self.finishedFiles = [i for i in listdir(finishedFilePath) if isfile(join(finishedFilePath, i))]
@@ -418,9 +415,13 @@ class Model:
     def playMovieForEndTime(self, movie):
         # self.setFilePaths()
         self.movieConstruct(movie)
-        startTime = int(self.getEndOfFile(movie)) - 10
+        waldo("end of file", int(self.getEndOfFile(movie)))
+        startTime = int(int(self.getEndOfFile(movie)) * .85 / 1000)
+        waldo("start time", startTime)
         # playCommand = "mplayer " + str(self.originFile) + " -sstep 5 -ss {} -osdlevel 2 -fs ".format(str(startTime))
-        playCommand = "mplayer " + str(self.originFile) + " -osdlevel 2 -fs "
+        playCommand = "mplayer -vo gl_nosw -ss {start} -osdlevel 2 -fs {file}".format(start=str(startTime), file=str(self.originFile))
+        # playCommand = "mplayer -vo gl_nosw -osdlevel 2 -fs " + str(self.originFile)
+        # playCommand = "mplayer " + str(self.originFile) + " -osdlevel 2 -fs "
         os.system(playCommand)
 
 
@@ -429,3 +430,21 @@ class Model:
         #arrow keys skip time
         #-ss start time
         # -sstep skips frames in seconds
+
+    def prepComputerInput(self):
+        tvTimeCommand = "ivtv-tune -c3"
+        #VLC needs to be set to channel 32 raw hw 1,0 and NTSC
+        runVLCCommand = "VLC "
+
+        os.system(tvTimeCommand)
+        # os.system(runVLCCommand)
+
+
+    def recordVideoNow(self, movieName, endTime = 14400):
+        #14400 seconds represents four hours
+        #need to add end time for video0 ref
+
+        recordCommand = "timeout {endTime} cat /dev/video0 > {path}{name}.mpg".format(path=str(rawVHSFilepath), name=str(movieName), endTime=str(endTime))
+
+
+        os.system(recordCommand)
