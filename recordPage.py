@@ -43,7 +43,7 @@ class RecordPage(tk.Frame):
         #Convert Endtime from hours
         endTime = int(endTime * 60 * 60)
         movieName = self.movieName.get()
-
+        
         self.appController.recordVideoNow(str(movieName), endTime)
 
 
