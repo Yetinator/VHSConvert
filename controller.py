@@ -93,3 +93,9 @@ class AppController():
 
     def playMovieForEndTime(self, movie):
         self.model.playMovieForEndTime(movie)
+
+    def prepComputerInput(self):
+        self.model.prepComputerInput()
+
+    def recordVideoNow(self, movieName, endTime):
+        self.model.recordVideoNow(movieName, endTime)

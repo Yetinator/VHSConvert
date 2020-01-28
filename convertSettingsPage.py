@@ -100,8 +100,6 @@ class ConvertSettingsPage(tk.Frame):
 
         # self.buttonB.set("16/9")
 
-        waldo("should be a radiobutton " , self.buttonB)
-
 
 
 

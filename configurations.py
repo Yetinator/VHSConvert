@@ -12,7 +12,7 @@
 # FINISHED_VHS_FILEPATH = "/home/brian/Videos/FinishedVHSFiles/"
 # VHS_OUTPUT_FILEPATH = "/home/brian/Videos/VHSOutput/"
 REFERENCE_FILES_FILEPATH ="resources/"
-MPLAYERRANGE = ["00:00:03", "00:00:07"]
+MPLAYERRANGE = ["00:00:03", "00:02:07"]
 
 SCREEN_GEOMETRY = "900x600"
 LIST_BOX_WIDTH = 75
