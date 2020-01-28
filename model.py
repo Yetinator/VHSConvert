@@ -436,7 +436,11 @@ class Model:
         #VLC needs to be set to channel 32 raw hw 1,0 and NTSC
         runVLCCommand = "VLC "
 
+<<<<<<< HEAD
         #os.system(tvTimeCommand)
+=======
+        os.system(tvTimeCommand)
+>>>>>>> cbbe1a6bee0b85eebb814945edd7d26145b699ee
         # os.system(runVLCCommand)
 
 
@@ -444,8 +448,12 @@ class Model:
         #14400 seconds represents four hours
         #need to add end time for video0 ref
 
+<<<<<<< HEAD
         #recordCommand = "timeout {endTime} cat /dev/video0 > {path}{name}.mpg".format(path=str(rawVHSFilepath), name=str(movieName), endTime=str(endTime))
         print("record option disabled")
+=======
+        recordCommand = "timeout {endTime} cat /dev/video0 > {path}{name}.mpg".format(path=str(rawVHSFilepath), name=str(movieName), endTime=str(endTime))
+>>>>>>> cbbe1a6bee0b85eebb814945edd7d26145b699ee
 
 
         os.system(recordCommand)
