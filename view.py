@@ -12,6 +12,7 @@ from configurationsSystem import *
 from convertSettingsPage import *
 from movieSelectionPage import *
 from playPage import *
+from deletePage import *
 
 class View(tk.Tk):
 
@@ -24,7 +25,7 @@ class View(tk.Tk):
 
     # def __init__(self, parent, controller):
     def __init__(self):
-        self.pageList = (StartPage, PageTwo, ConvertSettingsPage, MovieSelectionPage, PlayPage)
+        self.pageList = (StartPage, DeletePage, ConvertSettingsPage, MovieSelectionPage, PlayPage)
         #Wtf is the parent here?
         # self.controller = controller
         self.appController = controller.AppController()
@@ -77,7 +78,7 @@ class View(tk.Tk):
         self.recordButton = tk.Button(container, text="Record", command=self.functionRecord)
         self.convertButton = tk.Button(container, text="Convert", command=self.functionConvert)
         self.playButton = tk.Button(container, text="Play", command=self.functionPlay)
-        self.test1Button = tk.Button(container, text="Test1", command=self.functionTest1)
+        self.deleteButton = tk.Button(container, text="Delete Stuff", command=self.functionDelete)
         self.test2Button = tk.Button(container, text="Test2", command=self.functionTest2)
         self.exitButton = tk.Button(container, text="Exit", command=self.exitProgram)
 
@@ -85,7 +86,7 @@ class View(tk.Tk):
         self.recordButton.pack(fill=tk.X, expand=1)
         self.convertButton.pack(fill=tk.X, expand=1)
         self.playButton.pack(fill=tk.X, expand=1)
-        self.test1Button.pack(fill=tk.X, expand=1)
+        self.deleteButton.pack(fill=tk.X, expand=1)
         self.test2Button.pack(fill=tk.X, expand=1)
         self.exitButton.pack(fill=tk.X, expand=1)
 
@@ -144,11 +145,11 @@ class View(tk.Tk):
     def functionPlay(self):
         self.showFrame(PlayPage)
 
-    def functionTest1(self):
-        self.showFrame(StartPage)
+    def functionDelete(self):
+        self.showFrame(DeletePage)
 
     def functionTest2(self):
-        self.showFrame(PageTwo)
+        self.showFrame(StartPage)
 
     def convertSettings(self):
         #bad name, switch to convertSettingsPage
@@ -167,43 +168,20 @@ class StartPage(tk.Frame):
         label = tk.Label(self, text = "What the?")
         label.pack()
 
-        butt = tk.Button(self, text="Change to Page 2", bg="teal", command=self.func1)
-        butt2 = tk.Button(self, text="Change to Page 3", bg="cyan", command=self.func2)
+        butt = tk.Button(self, text="do nothing", bg="teal", command=self.func1)
+        butt2 = tk.Button(self, text="do nothing", bg="cyan", command=self.func2)
 
         butt.pack(fill=tk.X, expand=1)
         butt2.pack(fill=tk.X, expand=1)
 
     def func1(self):
-        self.tkObj.showFrame(PageTwo)
+        pass
 
     def func2(self):
         # self.controller.showFrame(PageThree)
         pass
 
 
-class PageTwo(tk.Frame):
-
-    def __init__(self, parent, tkObj, appController):
-        tk.Frame.__init__(self, parent)
-        self.tkObj = tkObj
-        self.parent = parent
-        self.appController = appController
-        #LARGE_FONT defined above
-        label = tk.Label(self, text = "Second?")
-        label.pack()
-
-        butt = tk.Button(self, text="Change to Start Page", bg="teal", command=self.func1)
-        butt2 = tk.Button(self, text="Change to Page 3", bg="cyan", command=self.func2)
-
-        butt.pack()
-        butt2.pack()
-
-    def func1(self):
-        self.tkObj.showFrame(StartPage)
-
-    def func2(self):
-        # self.controller.showFrame(PageThree)
-        pass
 
 
 

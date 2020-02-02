@@ -12,7 +12,7 @@ from configurations import *
 from configurationsSystem import *
 
 #hocus pocus
-mypath = "/home/brian/Videos/RawVHSFiles"
+mypath = RAW_VHS_FILEPATH
 from os import listdir
 from os.path import isfile, join
 onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
@@ -26,12 +26,6 @@ cropDetectTimeRange = MPLAYERRANGE
 
 onlyfiles = [f for f in listdir(rawVHSFilepath) if isfile(join(rawVHSFilepath, f))]
 # self.finishedFiles = [i for i in listdir(finishedFilePath) if isfile(join(finishedFilePath, i))]
-
-# def waldo(variableName, variable):
-#     print("\n")
-#     print("----------------Where's waldo?----------------")
-#     print("The value of " + variableName + " is: " + variable + " of type " + str(type(variable)))
-#     print("\n")
 
 # Model class here, basically MenConstruct class
 class Model:
@@ -57,6 +51,7 @@ class Model:
 
     def refresh(self):
         self.finishedFiles = [i for i in listdir(finishedFilePath) if isfile(join(finishedFilePath, i))]
+        onlyfiles = [f for f in listdir(rawVHSFilepath) if isfile(join(rawVHSFilepath, f))]
 
     def functionRecord(self):
         #record Function
@@ -83,19 +78,11 @@ class Model:
     def movieConstruct(self, movieChoice):
         self.movieTitle = self.convertMovieToTitle(movieChoice)
         self.setFilePaths()
-        # waldo("self.movieTitle", self.movieTitle)
-        print("title of movie " + self.movieTitle)
-        print("movieChoice " + movieChoice)
-        print("type " + str(type(movieChoice)))
         self.getEndOfFile(movieChoice)
 
     def moviePlayConstruct(self, movieChoice):
         self.movieTitle = self.convertMovieToTitle(movieChoice)
         self.setFilePaths()
-        # waldo("self.movieTitle", self.movieTitle)
-        print("title of movie " + self.movieTitle)
-        print("movieChoice " + movieChoice)
-        print("type " + str(type(movieChoice)))
         # self.getEndOfFile(movieChoice)
 
 
@@ -191,24 +178,39 @@ class Model:
         theList = []
         for item in self.finishedFiles:
             theList.append(item)
-        for i in theList:
-            waldo("model list", i)
         return theList
+        
+    def getMoviesToDelete(self):
+        #self.refresh()
+        deleteList = []
+        raw = self.getRawMovieFileList()
+        finished = self.getFinishedMovieFileList()
+        temp = []
+        #need handling for VHS.avi vs .mpg
+        for n in range(len(finished)):
+            finished[n] = finished[n][:-7]
+            print(finished[n])
+
+        raw2 = {}
+        for n in range(len(raw)):
+            raw2[n] = raw[n][:-4]
+
+        for n in raw2:
+            if (raw2[n] in finished):
+                temp.append(raw[n]) 
+            else:
+                print("IN: " + str(n))
+                
+        return temp
 
     def isFileWriteSafe(self, file):
-        # waldo("file in isFileWriteSafe", file)
         theFile = self.removeWhateverPrefixAndSuffix(file)
         finishedList = []
         list = self.getFinishedMovieFileList()
         for i in list:
-            # waldo("i is ", i)
             finishedList.append(self.removeWhateverPrefixAndSuffix(i))
 
-        # for j in finishedList:
-            # waldo("j", j)
-
         if theFile in finishedList:
-            # waldo("file is in finished list", file)
             print("already exists")
             return False
 
@@ -418,9 +420,16 @@ class Model:
     def playMovieForEndTime(self, movie):
         # self.setFilePaths()
         self.movieConstruct(movie)
-        startTime = int(self.getEndOfFile(movie)) - 10
-        # playCommand = "mplayer " + str(self.originFile) + " -sstep 5 -ss {} -osdlevel 2 -fs ".format(str(startTime))
-        playCommand = "mplayer " + str(self.originFile) + " -osdlevel 2 -fs "
+        endTime = int(self.getEndOfFile(movie)) / 1000
+        print("endTime " + str(endTime))
+        startTime = "01:30:00"
+        if endTime < 10500:
+            startTime = int(endTime * .94)
+        #startTime = 20
+        print("start time looks like this : " + str(startTime))
+        playCommand = "mplayer " + str(self.originFile) + " -ss {startTime} -osdlevel 2 -fs ".format(startTime = str(startTime))
+        #playCommand = "mplayer " + str(self.originFile) + " -sstep 5 -ss {startTime} -osdlevel 2 -fs ".format(startTime = str(startTime))
+        #playCommand = "mplayer " + str(self.originFile) + " -osdlevel 2 -fs "
         os.system(playCommand)
 
 
@@ -429,3 +438,15 @@ class Model:
         #arrow keys skip time
         #-ss start time
         # -sstep skips frames in seconds
+        
+    def deleteRawMovieFileFromRawMoviePath(self, movie):  
+        deleteFile = rawVHSFilepath + str(movie)
+        deleteCommand = "rm " + str(deleteFile)
+         
+    
+        print("In model trying to delete: " + str(deleteCommand))
+        os.system(deleteCommand)
+        self.refresh()
+        
+        
+        

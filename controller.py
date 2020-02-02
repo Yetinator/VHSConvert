@@ -15,8 +15,8 @@ class AppController():
         self.model = model.Model()
 
     def refresh(self):
-        self.model.refresh()
-
+        #self.model.refresh()
+        pass
 
 
     #Initializer Function
@@ -41,16 +41,17 @@ class AppController():
         raw2 = {}
         for n in range(len(raw)):
             raw2[n] = raw[n][:-4]
-            print("What?")
 
         for n in raw2:
             if (raw2[n] not in finished):
-                temp.append(raw[n])
-                print("movie not in " + str(n))
+                temp.append(raw[n]) 
             else:
                 print("IN: " + str(n))
 
         return temp
+        
+    def getMoviesToDelete(self):
+        return self.model.getMoviesToDelete()
 
 
     def getFinishedMovieFileList(self):
@@ -93,3 +94,6 @@ class AppController():
 
     def playMovieForEndTime(self, movie):
         self.model.playMovieForEndTime(movie)
+        
+    def deleteRawMovieFileFromRawMoviePath(self, movie):
+        self.model.deleteRawMovieFileFromRawMoviePath(movie)
