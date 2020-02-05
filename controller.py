@@ -97,3 +97,12 @@ class AppController():
         
     def deleteRawMovieFileFromRawMoviePath(self, movie):
         self.model.deleteRawMovieFileFromRawMoviePath(movie)
+        
+    def startRecording(self, movieTitle, timeout):
+        self.model.startRecording(movieTitle, timeout)
+        
+    def stopRecording(self):
+        self.model.stopRecording()
+        
+    def doInLoop(self):
+        self.model.doInLoop()

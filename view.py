@@ -13,6 +13,7 @@ from convertSettingsPage import *
 from movieSelectionPage import *
 from playPage import *
 from deletePage import *
+from recordPage import *
 
 class View(tk.Tk):
 
@@ -25,7 +26,7 @@ class View(tk.Tk):
 
     # def __init__(self, parent, controller):
     def __init__(self):
-        self.pageList = (StartPage, DeletePage, ConvertSettingsPage, MovieSelectionPage, PlayPage)
+        self.pageList = (StartPage, DeletePage, RecordPage, ConvertSettingsPage, MovieSelectionPage, PlayPage)
         #Wtf is the parent here?
         # self.controller = controller
         self.appController = controller.AppController()
@@ -42,6 +43,7 @@ class View(tk.Tk):
         # parent.showFrame(StartPage)
 
         #self.canvas.bind("")
+        self.looptieLoop()
 
     #Initializer Function
     def createInterfaceBase(self):
@@ -131,10 +133,19 @@ class View(tk.Tk):
     #     #looking at the frames list at position cont
     #     frame = self.frames[cont]
     #     frame.tkraise()
+    
+    def looptieLoop(self):
+        #this was how I implemented refresh in bicycle stopwatch.  
+        #it is a loop that allows the tkinter mainloop to still do its thing
+        #event watchers or whatever can go here.  
+        self.appController.doInLoop()
+        
+        self.after(1, self.looptieLoop)
 
     #Button functions below
     def functionRecord(self):
-        pass
+        #self.frames[RecordPage].refresh()
+        self.showFrame(RecordPage)
 
     def functionConvert(self):
 

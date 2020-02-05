@@ -2,6 +2,7 @@
 #sudo apt-get install mediainfo
 import os
 import subprocess
+import signal
 from pathlib import Path
 import tempfile
 import time
@@ -45,6 +46,11 @@ class Model:
         self.finishedFile = False
         self.movieSuffix = False
         self.playFile = False
+        self.recordProcess = False
+        self.tvtune = False
+        self.isRecording = False
+        self.startTime = False
+        self.finishTime = False
         # self.finishedFile = referanceFilePathOutputFiles + str(self.title) + "VHS.avi"
 
         # self.referanceFilePathOriginalMovies = referanceFilePath
@@ -448,5 +454,41 @@ class Model:
         os.system(deleteCommand)
         self.refresh()
         
+        
+    def startRecording(self, movieTitle, timeout):
+        filepath = rawVHSFilepath + str(movieTitle)
+        if self.tvtune == False:
+            tvtuner = os.system("ivtv-tune -c3")
+            self.tvtune=True
+            print("tv tune status? " + str(tvtuner))
+        recordCommand = "cat /dev/video0 > {filename}".format(filename=filepath)
+        #recordCommand = "timeout {time}m cat /dev/video0 > {filename}".format(time=int(timeout), filename=filepath)
+        self.recordProcess = subprocess.Popen(recordCommand, shell=True, preexec_fn=os.setsid)
+        timer = str(timeout) + "m"
+        timeInSeconds = int(timeout) * 60
+        self.startTime = time.time()
+        self.finishTime = self.startTime + timeInSeconds
+        self.isRecording = True
+        #time.sleep(timeout * 60)
+
+        #self.stopRecording()
+        #self.recordProcess = subprocess.Popen(recordCommand, shell=True)
+        
+    def stopRecording(self):
+        os.killpg(os.getpgid(self.recordProcess.pid), signal.SIGTERM)
+        self.isRecording = False
+        #subprocess.Popen.kill(self.recordProcess)
+        
+    def doInLoop(self):
+        if (self.isRecording == True):
+            thisTime = time.time()
+            if thisTime > self.finishTime:
+                self.stopRecording()
+                self.isRecording = False
+                print("Stop Recording at : " + str(thisTime - self.startTime))
+            else:
+                thisTime = time.time()
+                print("Is Recording Time = " + str(round(thisTime - self.startTime))) 
+            
         
         
